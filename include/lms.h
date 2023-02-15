@@ -3,14 +3,33 @@
 
 #define MAX_ORDER 100
 
+#define LMS_OK      0
+#define LMS_ERROR   1
+
 typedef struct
 {
     double step;
     int order;
-    double weights[MAX_ORDER];
-} LMSFilter;
+    double coefficients[MAX_ORDER];
+} LmsFilter_t;
 
-void init_lms_filter(LMSFilter* filter, double step, int order);
-void filter(LMSFilter* filter, double* input_signal, double* desired_signal, double* output_signal, int num_samples);
+/**
+ * @brief Initialize the filter structure with step size and filter order
+ * @param filter    Structure holding LMS filter
+ * @param ftep      Step size
+ * @param order     Filter order
+ * @return LMS_OK when filter initialised succesfully. Otherwise, return LMS_ERROR
+ */
+int lmsInitFilter(LmsFilter_t* filter, double step, int order);
 
-#endif
+/**
+ * @brief LMS filtering function. Applying the filter to the input signal and desired signal
+ * @param filter            Pointer to LMS filter structure
+ * @param inputSignal       Array of input signal samples, e.g. noise corrupted signal
+ * @param desiredSignal     Array of additional input signal
+ * @param outputSignal      Array of output signal
+ * @param numSamples        Filter size/order
+ */
+void lmsFilterSignal(LmsFilter_t* filter, const double* inputSignal, const double* desiredSignal, double* outputSignal, int numSamples);
+
+#endif  /* LMS_H */

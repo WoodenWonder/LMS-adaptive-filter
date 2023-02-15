@@ -1,52 +1,61 @@
+#include <stddef.h>
 #include "lms.h"
 
-/* Initialize the filter with step size and filter order */
-void init_lms_filter(LMSFilter* filter, double step, int order)
+int lmsInitFilter(LmsFilter_t* filter, double step, int order)
 {
-	int i;
+    int retval = LMS_ERROR;
 
-    filter->step = step;
-    filter->order = order;
-
-    for (i = 0; i < order; i++)
+    if (filter != NULL)
     {
-        filter->weights[i] = 0.0;
+        if (order <= MAX_ORDER)
+        {
+            filter->step = step;
+            filter->order = order;
+
+            for (int i = 0; i < order; i++)
+            {
+                filter->coefficients[i] = 0.0;
+            }
+            retval = LMS_OK;
+        }
+        else
+        {
+            printf("Filter order exceeds MAX_ORDER %d\n", MAX_ORDER);
+        }
     }
+    return retval;
 }
 
-/* Apply the filter to the input signal and desired signal */
-void filter(LMSFilter* filter, double* input_signal, double* desired_signal, double* output_signal, int num_samples)
+void lmsFilterSignal(LmsFilter_t* filter, const double* inputSignal, const double* desiredSignal, double* outputSignal, int numSamples)
 {
-    int n;
-    for (n = 0; n < num_samples; n++)
+    double y = 0.0;                 /* fitler output */
+    double e = 0.0;                 /* error signal */
+    double x[MAX_ORDER] = { 0 };    /* fitler input */
+
+    for (int n = 0; n < numSamples; n++)
     {
         int k;
-        double x[MAX_ORDER];
         for (k = 0; k < filter->order; k++)
         {
             int index = n + k;
-            if (index < num_samples)
+            if (index < numSamples)
             {
-                x[k] = input_signal[index];
+                x[k] = inputSignal[index];
             }
             else
             {
                 x[k] = 0.0;
             }
+            y += filter->coefficients[k] * x[k];
         }
 
-        double y = 0.0;
-        for (k = 0; k < filter->order; k++)
-        {
-            y += filter->weights[k] * x[k];
-        }
-        double e = desired_signal[n] - y;
+        e = desiredSignal[n] - y;
 
         for (k = 0; k < filter->order; k++)
         {
-            filter->weights[k] += filter->step * e * x[k];
+            filter->coefficients[k] += filter->step * e * x[k];
         }
 
-        output_signal[n] = y;
+        outputSignal[n] = y;
     }
 }
