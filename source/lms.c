@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdio.h>
 #include "lms.h"
 
 int lmsInitFilter(LmsFilter_t* filter, double step, int order)
