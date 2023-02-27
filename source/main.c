@@ -199,21 +199,17 @@ static int saveGeneratedSamplesToFile(const SignalGenerator_t *settings, double*
         }
     }
 
-    long tmpSize = ftell(tmp);
-    char *tmpBuffer;
-    tmpBuffer = (char*)malloc(tmpSize);
-
-    fseek(tmp, 0, SEEK_SET);
-
+    char tmpBuffer[8192];
     unsigned long nread;
-    nread = fread(tmpBuffer, 1, tmpSize, tmp);
 
     for (int i = 0; i < settings->periods; i++)
     {
-        fwrite(tmpBuffer, 1, nread, file);
+        fseek(tmp, 0, SEEK_SET);
+        while ((nread = fread(tmpBuffer, 1, sizeof(tmpBuffer), tmp)) > 0)
+        {
+            fwrite(tmpBuffer, 1, nread, file);
+        }
     }
-
-    free(tmpBuffer);
 
     if (fclose(tmp))
     {
