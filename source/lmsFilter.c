@@ -1,8 +1,13 @@
+/**
+ *  @brief Lms filter source file
+ *  @author shed258
+ */
+
 #include <stddef.h>
 #include <stdio.h>
-#include "lms.h"
+#include "lmsFilter.h"
 
-int lmsInitFilter(LmsFilter_t* filter, double step, int order)
+int lmsFilter_Init(LmsFilter_t* filter, double step, int order)
 {
     int retval = LMS_ERROR;
 
@@ -27,7 +32,7 @@ int lmsInitFilter(LmsFilter_t* filter, double step, int order)
     return retval;
 }
 
-void lmsFilterSignal(LmsFilter_t* filter, const double* inputSignal, const double* desiredSignal, double* outputSignal, int numSamples)
+void lmsFilter_FilterSignal(LmsFilter_t* filter, const double* inputSignal, const double* desiredSignal, double* outputSignal, int numSamples)
 {
     double y = 0.0;                 /* fitler output */
     double e = 0.0;                 /* error signal */
