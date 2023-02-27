@@ -264,10 +264,6 @@ int main(int argc, char **argv)
                 outputSamples = (double*)malloc(signalSettings.periods * signalSettings.resolution * sizeof(double));
                 signalGenerator_generateSignal(&signalSettings, outputSamples);
                 retval = saveGeneratedSamplesToFile(&signalSettings, outputSamples, argv[ARG_FILE]);
-                if (retval != EXIT_SUCCESS)
-                {
-                    return EXIT_FAILURE;
-                }
                 free(outputSamples);
             }
             else
