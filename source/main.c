@@ -12,8 +12,6 @@
 #define MAX_ARGC_NUMBER 6
 #define ARGC_NUMBER_FOR_GENERATE_MODE 6
 
-const char *tmpFileName = "tmp";
-
 typedef enum
 {
     ARG_TYPE = 2,
@@ -167,6 +165,7 @@ static int processArgsToGenerateWaveform(char* arg, ArgGenerate_t index, SignalG
 static int saveGeneratedSamplesToFile(const SignalGenerator_t *settings, double* outputSamples, const char* fileName)
 {
     int retval = EXIT_SUCCESS;
+    const char *tmpFileName = "tmp";
 
     FILE *tmp = fopen(tmpFileName, "w+");
     if (!tmp)
@@ -188,7 +187,7 @@ static int saveGeneratedSamplesToFile(const SignalGenerator_t *settings, double*
         snprintf(outputSamplesAsCharacter, sizeof(outputSamplesAsCharacter), "%f", outputSamples[m]);
         if (fputs(outputSamplesAsCharacter, tmp) != EOF)
         {
-            if (fputc('\n', tmp) == EOF)
+            if (fputs(";\n", tmp) == EOF)
             {
                 return EXIT_FAILURE;
             }
