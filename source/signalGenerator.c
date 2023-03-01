@@ -40,11 +40,11 @@ TypeOfGenSignal_t signalGenerator_processArgumentType(const char* type)
     return retval;
 }
 
-int signalGenerator_processArgumentPeriods(const char* periods)
+unsigned int signalGenerator_processArgumentPeriods(const char* periods)
 {
-    int retval = -1;
+    unsigned int retval = 0;
     char character;
-    int argNumber;
+    unsigned int argNumber;
 
     for (int i = 0; (periods[i] != '\0'); i++)
     {
@@ -67,11 +67,11 @@ int signalGenerator_processArgumentPeriods(const char* periods)
     return retval;
 }
 
-int signalGenerator_processArgumentResolution(const char* resolution)
+unsigned int signalGenerator_processArgumentResolution(const char* resolution)
 {
-    int retval = -1;
+    unsigned int retval = 0;
     char character;
-    int argNumber;
+    unsigned int argNumber;
 
     for (int i = 0; (resolution[i] != '\0'); i++)
     {

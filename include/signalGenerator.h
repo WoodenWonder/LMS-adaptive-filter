@@ -18,8 +18,8 @@ typedef enum
 typedef struct
 {
     TypeOfGenSignal_t type;
-    int periods;
-    int resolution;
+    unsigned int periods;
+    unsigned int resolution;
 } SignalGenerator_t;
 
 /**
@@ -34,14 +34,14 @@ TypeOfGenSignal_t signalGenerator_processArgumentType(const char* type);
  * @param periods  string with argument to process
  * @return the number of periods of the generated signal
  */
-int signalGenerator_processArgumentPeriods(const char* periods);
+unsigned int signalGenerator_processArgumentPeriods(const char* periods);
 
 /**
  * @brief Process argument <resolution>
  * @param resolution  string with argument to process
  * @return the number ot samples in one period
  */
-int signalGenerator_processArgumentResolution(const char* resolution);
+unsigned int signalGenerator_processArgumentResolution(const char* resolution);
 
 /**
  * @brief Generate waveform based on given parameters
