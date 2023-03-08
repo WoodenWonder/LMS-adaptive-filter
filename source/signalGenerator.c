@@ -15,14 +15,70 @@
 /**
  * @brief Generate sine wave based on given parameters
  * @param outputSamples     Buffer with generated samples
- * @param resolution        Samples resolution of generated sine wave
+ * @param resolution        Resolution of generated sine wave
+ * @return EXIT_SUCCESS when sine waveform generated and saved to the file
  */
-static void signalGenerator_generateSine(double* outputSamples, int resolution)
+static int signalGenerator_generateSine(const SignalGenerator_t *settings, const char* outputFileName)
 {
-    for (int i = 0; i < resolution; i++)
+    int retval = EXIT_SUCCESS;
+    char outputSamplesAsCharacter[32];
+
+    double* outputSamples = NULL;
+    outputSamples = (double*)malloc(settings->resolution * sizeof(double));
+
+    FILE *file = fopen(outputFileName, "w");
+    if (!file)
     {
-        outputSamples[i] = sin((i*TWO_PI)/resolution);
+        perror(outputFileName);
+        return EXIT_FAILURE;
     }
+    printf("Output file:                  %s \n", outputFileName);
+
+    for (unsigned int n = 0; n < settings->cycles; n++)
+    {
+        for (unsigned int i = 0; i < settings->resolution; i++)
+        {
+            if (n == 0) /* Generate one waveform in first iteration and then use it in next cycles */
+            {
+                outputSamples[i] = sin((i*TWO_PI)/settings->resolution);
+            }
+            snprintf(outputSamplesAsCharacter, sizeof(outputSamplesAsCharacter), "%f", outputSamples[i]);
+            if (fputs(outputSamplesAsCharacter, file) != EOF)
+            {
+                if (fputs(";\n", file) == EOF)
+                {
+                    return EXIT_FAILURE;
+                }
+            }
+            else
+            {
+                return EXIT_FAILURE;
+            }
+        }
+
+        int progress = 0;
+        if (((n % 10) == 0) || (n == settings->cycles - 1))
+        {
+            progress = ((double)n/settings->cycles)*100;
+            if (n == settings->cycles - 1)
+            {
+                progress = 100;
+            }
+            printf("Waveform generation progress: %d%%\r", progress);
+            fflush(stdout);
+        }
+    }
+    printf("\n");
+
+    free(outputSamples);
+
+    if (fclose(file))
+    {
+        perror(outputFileName);
+        return EXIT_FAILURE;
+    }
+
+    return retval;
 }
 
 TypeOfGenSignal_t signalGenerator_processArgumentType(const char* type)
@@ -32,6 +88,7 @@ TypeOfGenSignal_t signalGenerator_processArgumentType(const char* type)
     if (strncmp(type, "sine", (sizeof("--sine")-1)) == 0)
     {
         retval = GEN_SIGNAL_SINE;
+        printf("Signal type:                  sine\n");
     }
     else
     {
@@ -40,29 +97,30 @@ TypeOfGenSignal_t signalGenerator_processArgumentType(const char* type)
     return retval;
 }
 
-unsigned int signalGenerator_processArgumentPeriods(const char* periods)
+unsigned int signalGenerator_processArgumentCycles(const char* cycles)
 {
     unsigned int retval = 0;
     char character;
     unsigned int argNumber;
 
-    for (int i = 0; (periods[i] != '\0'); i++)
+    for (int i = 0; (cycles[i] != '\0'); i++)
     {
-        character = periods[i];
+        character = cycles[i];
         if (!isdigit(character))
         {
-            printf("ERROR: Argument <periods> contains non-digit characters\n");
+            printf("ERROR: Argument <cycles> contains non-digit characters\n");
             return retval;
         }
     }
-    argNumber = atoi(periods);
+    argNumber = atoi(cycles);
     if (argNumber > 0)
     {
         retval = argNumber;
+        printf("Number of cycles:             %d \n", retval);
     }
     else
     {
-        printf("ERROR: Number for <periods> must be greater than 0\n");
+        printf("ERROR: Number for <cycles> must be greater than 0\n");
     }
     return retval;
 }
@@ -82,12 +140,11 @@ unsigned int signalGenerator_processArgumentResolution(const char* resolution)
             return retval;
         }
     }
-
     argNumber = atoi(resolution);
-
     if ((argNumber > 1) && (argNumber <= SIGNAL_GEN_MAX_RESOLUTION))
     {
         retval = argNumber;
+        printf("Signal resolution:            %d \n", retval);
     }
     else
     {
@@ -96,18 +153,25 @@ unsigned int signalGenerator_processArgumentResolution(const char* resolution)
     return retval;
 }
 
-void signalGenerator_generateSignal(const SignalGenerator_t *settings, double* outputSamples)
+int signalGenerator_generateSignal(const SignalGenerator_t *settings, const char* outputFileName)
 {
+    int retval = EXIT_SUCCESS;
+
     switch(settings->type)
     {
         case GEN_SIGNAL_SINE:
-            if (outputSamples != NULL)
+            if (outputFileName != NULL)
             {
-                signalGenerator_generateSine(outputSamples, settings->resolution);
+                if (signalGenerator_generateSine(settings, outputFileName) != EXIT_SUCCESS)
+                {
+                    retval = EXIT_FAILURE;
+                }
             }
             break;
 
         default:
+            retval = EXIT_FAILURE;
             break;
     }
+    return retval;
 }

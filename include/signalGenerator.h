@@ -18,7 +18,7 @@ typedef enum
 typedef struct
 {
     TypeOfGenSignal_t type;
-    unsigned int periods;
+    unsigned int cycles;
     unsigned int resolution;
 } SignalGenerator_t;
 
@@ -30,24 +30,25 @@ typedef struct
 TypeOfGenSignal_t signalGenerator_processArgumentType(const char* type);
 
 /**
- * @brief Process argument <periods>
- * @param periods  string with argument to process
- * @return the number of periods of the generated signal
+ * @brief Process argument <cycles>
+ * @param cycles  string with argument to process
+ * @return the number of cycles of the generated signal
  */
-unsigned int signalGenerator_processArgumentPeriods(const char* periods);
+unsigned int signalGenerator_processArgumentCycles(const char* cycles);
 
 /**
  * @brief Process argument <resolution>
  * @param resolution  string with argument to process
- * @return the number ot samples in one period
+ * @return the number ot samples in one cycle
  */
 unsigned int signalGenerator_processArgumentResolution(const char* resolution);
 
 /**
  * @brief Generate waveform based on given parameters
  * @param settings          Set of parameters of generated signal
- * @param outputSamples     Buffer with generated samples
+ * @param outputFileName    The name of the file to save samples to
+ * @return EXIT_SUCCESS when waveform generated and saved to the file
  */
-void signalGenerator_generateSignal(const SignalGenerator_t *settings, double* outputSamples);
+int signalGenerator_generateSignal(const SignalGenerator_t *settings, const char* outputFileName);
 
 #endif  /* SIGNAL_GENERATOR_H */

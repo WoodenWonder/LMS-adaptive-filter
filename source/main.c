@@ -17,7 +17,7 @@ typedef enum
 {
     GENERATE_ARG_TYPE = 2,
     GENERATE_ARG_RESOLUTION,
-    GENERATE_ARG_PERIODS,
+    GENERATE_ARG_CYCLES,
     GENERATE_ARG_FILE
 } ArgGenerate_t;
 
@@ -36,7 +36,7 @@ static const char *const usage[] =
     "Options:\n",
     "  --help                                               Display this information.\n",
     "  --version                                            Display version information.\n",
-    "  --generate <type> <resolution> <periods> <file>      Generate samples for the selected waveform and number of periods and save them to a file\n",
+    "  --generate <type> <resolution> <cycles> <file>       Generate samples for the selected waveform and number of cycles and save them to a file\n",
     "  --filter <length> <stepsize> <file>                  Filter the signal in the form of samples read from the file. The parameters of the LMS filter are filter length(order) and step size\n",
     NULL
 };
@@ -164,9 +164,9 @@ static int processArgsToGenerateWaveform(char* arg, ArgGenerate_t index, SignalG
             }
             break;
 
-        case GENERATE_ARG_PERIODS:
-            settings->periods = signalGenerator_processArgumentPeriods(arg);
-            if (settings->periods < 1)
+        case GENERATE_ARG_CYCLES:
+            settings->cycles = signalGenerator_processArgumentCycles(arg);
+            if (settings->cycles < 1)
             {
                 retval = EXIT_FAILURE;
             }
@@ -209,7 +209,7 @@ static int processArgsToStartFiltering(char* arg, ArgFilter_t index, LmsFilter_t
     {
         case FILTER_ARG_LENGTH:
             filter->length = lmsFilter_processArgumentFilterLength(arg);
-            printf("filter->length %d \n", filter->length);
+            printf("Filter length:                %d \n", filter->length);
             if (filter->length < 1)
             {
                 retval = EXIT_FAILURE;
@@ -218,7 +218,7 @@ static int processArgsToStartFiltering(char* arg, ArgFilter_t index, LmsFilter_t
 
         case FILTER_ARG_STEP_SIZE:
             filter->step = lmsFilter_processArgumentStepSize(arg);
-            printf("filter->step %f \n", filter->step);
+            printf("Step size:                    %f \n", filter->step);
             if (!(filter->step > 0))
             {
                 retval = EXIT_FAILURE;
@@ -235,80 +235,6 @@ static int processArgsToStartFiltering(char* arg, ArgFilter_t index, LmsFilter_t
         default:
             retval = EXIT_FAILURE;
             break;
-    }
-    return retval;
-}
-
-/**
- * @brief Save generated samples to a file
- * @param settings      Set of parameters of generated signal
- * @param outputSamples Buffer with generated samples
- * @param fileName      The name of the file to save samples to
-
- * @return EXIT_SUCCESS when all parameters correct
- */
-static int saveGeneratedSamplesToFile(const SignalGenerator_t *settings, double* outputSamples, const char* fileName)
-{
-    int retval = EXIT_SUCCESS;
-    const char *tmpFileName = "tmp";
-
-    FILE *tmp = fopen(tmpFileName, "w+");
-    if (!tmp)
-    {
-        perror(tmpFileName);
-        return EXIT_FAILURE;
-    }
-
-    FILE *file = fopen(fileName, "w");
-    if (!file)
-    {
-        perror(fileName);
-        return EXIT_FAILURE;
-    }
-
-    for (unsigned int m = 0; m < settings->resolution; m++)
-    {
-        char outputSamplesAsCharacter[32];
-        snprintf(outputSamplesAsCharacter, sizeof(outputSamplesAsCharacter), "%f", outputSamples[m]);
-        if (fputs(outputSamplesAsCharacter, tmp) != EOF)
-        {
-            if (fputs(";\n", tmp) == EOF)
-            {
-                return EXIT_FAILURE;
-            }
-        }
-        else
-        {
-            return EXIT_FAILURE;
-        }
-    }
-
-    char tmpBuffer[8192];
-    unsigned long nread;
-
-    for (unsigned int i = 0; i < settings->periods; i++)
-    {
-        fseek(tmp, 0, SEEK_SET);
-        while ((nread = fread(tmpBuffer, 1, sizeof(tmpBuffer), tmp)) > 0)
-        {
-            fwrite(tmpBuffer, 1, nread, file);
-        }
-    }
-
-    if (fclose(tmp))
-    {
-        perror(tmpFileName);
-        return EXIT_FAILURE;
-    }
-    if (fclose(file))
-    {
-        perror(fileName);
-        return EXIT_FAILURE;
-    }
-    if (remove(tmpFileName) != 0)
-    {
-        printf("Error: could not remove file %s \n", tmpFileName);
-        return EXIT_FAILURE;
     }
     return retval;
 }
@@ -340,11 +266,7 @@ int main(int argc, char **argv)
                         return EXIT_FAILURE;
                     }
                 }
-                double *outputSamples = NULL;
-                outputSamples = (double*)malloc(signalSettings.periods * signalSettings.resolution * sizeof(double));
-                signalGenerator_generateSignal(&signalSettings, outputSamples);
-                retval = saveGeneratedSamplesToFile(&signalSettings, outputSamples, argv[GENERATE_ARG_FILE]);
-                free(outputSamples);
+                retval = signalGenerator_generateSignal(&signalSettings, argv[GENERATE_ARG_FILE]);
             }
             else
             {
@@ -365,7 +287,7 @@ int main(int argc, char **argv)
                         return EXIT_FAILURE;
                     }
                 }
-                printf("ALL OK\n");
+                retval = lmsFilter_FilterSignalAndSaveToFile(&filter, argv[FILTER_ARG_FILE]);
             }
             else
             {

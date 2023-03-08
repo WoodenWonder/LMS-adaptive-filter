@@ -42,14 +42,17 @@ unsigned int lmsFilter_processArgumentFilterLength(const char* filterLength);
 double lmsFilter_processArgumentStepSize(const char* stepSize);
 
 /**
- * @brief LMS filtering function. Applying the filter to the input signal and desired signal
+ * @brief Filtering function.
+ * Applying the filter to the input signal and desired signal.
+ * Saving processed samples to the file.
+ * This implementation is a type of acoustic silencer. The input and desired signals are equal
  * @param filter            Pointer to LMS filter structure
- * @param inputSignal       Array of input signal samples, e.g. noise corrupted signal
  * @param desiredSignal     Array of additional input signal
  * @param outputSignal      Array of output signal
  * @param numSamples        Filter length/length
+ * @param fileName          Name of the file with input samples
+ * @return LMS_OK when processed succesfully. Otherwise, return LMS_ERROR
  */
-void lmsFilter_FilterSignal(LmsFilter_t* filter, const double* inputSignal, const double* desiredSignal,
-                            double* outputSignal, int numSamples);
+int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* fileName);
 
 #endif  /* LMS_FILTER_H */
