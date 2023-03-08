@@ -80,7 +80,7 @@ static int lmsFilter_Lms(LmsFilter_t* filter, const double* input, const double*
         *output = y;
     }
 
-    if (isnan(*output) || isnan(*error))
+    if (isfinite(*output) || isfinite(*error))
     {
         printf("WARNING: Algorithm goes unstable! stopped\n");
         retval = LMS_ERROR;
