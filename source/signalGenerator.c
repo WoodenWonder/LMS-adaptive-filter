@@ -77,7 +77,6 @@ static int signalGenerator_generateSine(const SignalGenerator_t *settings, const
         perror(outputFileName);
         return EXIT_FAILURE;
     }
-
     return retval;
 }
 
@@ -108,7 +107,7 @@ unsigned int signalGenerator_processArgumentCycles(const char* cycles)
         character = cycles[i];
         if (!isdigit(character))
         {
-            printf("ERROR: Argument <cycles> contains non-digit characters\n");
+            printf("ERROR: Argument <cycles> contains non-positive integer characters\n");
             return retval;
         }
     }
@@ -136,7 +135,7 @@ unsigned int signalGenerator_processArgumentResolution(const char* resolution)
         character = resolution[i];
         if (!isdigit(character))
         {
-            printf("ERROR: Argument <resolution> contains non-digit characters\n");
+            printf("ERROR: Argument <resolution> contains non-positive integer characters\n");
             return retval;
         }
     }

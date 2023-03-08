@@ -97,14 +97,13 @@ static int processGenerateArgumentFile(const char* filename)
         {
             if (filename[i] == illegalFilenameChars[j])
             {
-                retval = EXIT_FAILURE;
                 printf("ERROR: Argument <file> can not contain following characters: space ");
                 for (unsigned int n = 0; n < sizeof(illegalFilenameChars); n++)
                 {
                     printf("%c ", illegalFilenameChars[n]);
                 }
                 printf("\n");
-                break;
+                return EXIT_FAILURE;
             }
         }
     }

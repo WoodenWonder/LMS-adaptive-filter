@@ -85,7 +85,6 @@ static int lmsFilter_Lms(LmsFilter_t* filter, const double* input, const double*
         printf("WARNING: Algorithm goes unstable! stopped\n");
         retval = LMS_ERROR;
     }
-
     return retval;
 }
 
