@@ -6,8 +6,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
 #include <stddef.h>
+#include <ctype.h>
+#include <math.h>
 #include "lmsFilter.h"
 
 /**
@@ -49,12 +50,14 @@ static int lmsFilter_countNumberOfSamplesInFile(const char* fileName)
  * @param desired       Array of additional input
  * @param output        Array of output
  * @param error         Mean square error
+ * @return LMS_OK when processed succesfully. Otherwise, return LMS_ERROR
  */
-static void lmsFilter_Lms(LmsFilter_t* filter, const double* input, const double* desired,
-                          double* output, double* error)
+static int lmsFilter_Lms(LmsFilter_t* filter, const double* input, const double* desired,
+                         double* output, double* error)
 {
     (void)desired;
 
+    int retval = LMS_OK;
     double y = 0.0;                         /* fitler output */
     double x[MAX_FILTER_LENGTH] = { 0 };    /* fitler input */
     int k;
@@ -76,6 +79,14 @@ static void lmsFilter_Lms(LmsFilter_t* filter, const double* input, const double
         }
         *output = y;
     }
+
+    if (isnan(*output) || isnan(*error))
+    {
+        printf("WARNING: Algorithm goes unstable! stopped\n");
+        retval = LMS_ERROR;
+    }
+
+    return retval;
 }
 
 int lmsFilter_Init(LmsFilter_t* filter, double step, int length)
@@ -132,9 +143,9 @@ unsigned int lmsFilter_processArgumentFilterLength(const char* filterLength)
 
 double lmsFilter_processArgumentStepSize(const char* stepSize)
 {
-    unsigned int retval = 0;
+    double retval = 0;
     char character;
-    unsigned int argNumber;
+    double argNumber;
     static unsigned int dotCounter = 0;
 
     for (int i = 0; (stepSize[i] != '\0'); i++)
@@ -248,18 +259,12 @@ int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFi
             }
         }
 
-        lmsFilter_Lms(filter, window, NULL, &output, &errror);
-
-        fprintf(fFiltered, "%.6lf;%.6lf;%.6lf;\n", window[0], output, errror);
-
-        /*
-        for (int n = 0; n < filter->length; n++)
+        retval = lmsFilter_Lms(filter, window, NULL, &output, &errror);
+        if (retval != LMS_OK)
         {
-            printf("%lf;\n", window[n]);
+            break;
         }
-        printf("\n");
-        */
-
+        fprintf(fFiltered, "%.6lf;%.6lf;%.6lf;\n", window[0], output, errror);
         index++;
 
         if (((index % 10) == 0) || (index == numOfSamples))
