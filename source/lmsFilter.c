@@ -262,7 +262,7 @@ int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFi
 
         index++;
 
-        if (((index % 10) == 0) || (index == numOfSamples - 1))
+        if (((index % 10) == 0) || (index == numOfSamples))
         {
             progress = ((double)index/numOfSamples)*100;
             if (index == numOfSamples - 1)
