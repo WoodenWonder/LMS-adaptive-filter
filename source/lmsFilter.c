@@ -44,37 +44,37 @@ static int lmsFilter_countNumberOfSamplesInFile(const char* fileName)
 
 /**
  * @brief LMS filtering function. Applying the filter to the input signal and desired signal
- * @param filter            Pointer to LMS filter structure
- * @param inputSignal       Array of input signal samples, e.g. noise corrupted signal
- * @param desiredSignal     Array of additional input signal
- * @param outputSignal      Array of output signal
+ * @param filter        Pointer to LMS filter structure
+ * @param input         Array of input samples, e.g. noise corrupted signal
+ * @param desired       Array of additional input
+ * @param output        Array of output
+ * @param error         Mean square error
  */
-static void lmsFilter_Lms(LmsFilter_t* filter, const double* inputSignal,
-                          const double* desiredSignal, double* outputSignal)
+static void lmsFilter_Lms(LmsFilter_t* filter, const double* input, const double* desired,
+                          double* output, double* error)
 {
-    (void)desiredSignal;
+    (void)desired;
 
     double y = 0.0;                         /* fitler output */
-    double e = 0.0;                         /* error signal */
     double x[MAX_FILTER_LENGTH] = { 0 };    /* fitler input */
     int k;
 
     for (k = 0; k < filter->length; k++)
     {
-        x[k] = inputSignal[k];
+        x[k] = input[k];
         y += filter->coefficients[k] * x[k];
 
         /* The input and desired signals are equal */
-        e = inputSignal[0] - y;
+        *error = input[0] - y;
 
         /* By default in LMS algotithm it should go as in line below */
-        // e = desiredSignal[n] - y;
+        // *error = desired[n] - y;
 
         for (k = 0; k < filter->length; k++)
         {
-            filter->coefficients[k] += filter->step * e * x[k];
+            filter->coefficients[k] += filter->step * (*error) * x[k];
         }
-        *outputSignal = y;
+        *output = y;
     }
 }
 
@@ -210,7 +210,8 @@ int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFi
     double window[filter->length];
     int index = 0;
     int zerosToAdd = filter->length - 1;
-    double outputSignal = 0;
+    double output = 0;
+    double errror = 0;
     int progress = 0;
 
     /* Slide window through input file and print each subsequence */
@@ -247,9 +248,9 @@ int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFi
             }
         }
 
-        lmsFilter_Lms(filter, window, NULL, &outputSignal);
+        lmsFilter_Lms(filter, window, NULL, &output, &errror);
 
-        fprintf(fFiltered, "%.6lf;%.6lf;\n", window[0], outputSignal);
+        fprintf(fFiltered, "%.6lf;%.6lf;%.6lf;\n", window[0], output, errror);
 
         /*
         for (int n = 0; n < filter->length; n++)
