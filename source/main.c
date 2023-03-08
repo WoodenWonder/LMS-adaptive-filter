@@ -209,19 +209,25 @@ static int processArgsToStartFiltering(char* arg, ArgFilter_t index, LmsFilter_t
     {
         case FILTER_ARG_LENGTH:
             filter->length = lmsFilter_processArgumentFilterLength(arg);
-            printf("Filter length:                %d \n", filter->length);
             if (filter->length < 1)
             {
                 retval = EXIT_FAILURE;
+            }
+            else
+            {
+                printf("Filter length:                %d \n", filter->length);
             }
             break;
 
         case FILTER_ARG_STEP_SIZE:
             filter->step = lmsFilter_processArgumentStepSize(arg);
-            printf("Step size:                    %f \n", filter->step);
             if (!(filter->step > 0))
             {
                 retval = EXIT_FAILURE;
+            }
+            else
+            {
+                printf("Step size:                    %f \n", filter->step);
             }
             break;
 
