@@ -13,9 +13,9 @@
 
 typedef struct
 {
-    double step;
+    float step;
     int length;
-    double coefficients[MAX_FILTER_LENGTH];
+    float coefficients[MAX_FILTER_LENGTH];
 } LmsFilter_t;
 
 /**
@@ -25,7 +25,7 @@ typedef struct
  * @param length    Filter length
  * @return LMS_OK when filter initialised succesfully. Otherwise, return LMS_ERROR
  */
-int lmsFilter_Init(LmsFilter_t* filter, double step, int length);
+int lmsFilter_Init(LmsFilter_t* filter, float step, int length);
 
 /**
  * @brief Process argument <length>
@@ -39,7 +39,7 @@ unsigned int lmsFilter_processArgumentFilterLength(const char* filterLength);
  * @param stepSize  string with argument to process
  * @return Step size
  */
-double lmsFilter_processArgumentStepSize(const char* stepSize);
+float lmsFilter_processArgumentStepSize(const char* stepSize);
 
 /**
  * @brief Filtering function.

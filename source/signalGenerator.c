@@ -23,8 +23,8 @@ static int signalGenerator_generateSine(const SignalGenerator_t *settings, const
     int retval = EXIT_SUCCESS;
     char outputSamplesAsCharacter[32];
 
-    double* outputSamples = NULL;
-    outputSamples = (double*)malloc(settings->resolution * sizeof(double));
+    float* outputSamples = NULL;
+    outputSamples = (float*)malloc(settings->resolution * sizeof(float));
 
     FILE *file = fopen(outputFileName, "w");
     if (!file)
@@ -59,7 +59,7 @@ static int signalGenerator_generateSine(const SignalGenerator_t *settings, const
         int progress = 0;
         if (((n % 10) == 0) || (n == settings->cycles - 1))
         {
-            progress = ((double)n/settings->cycles)*100;
+            progress = ((float)n/settings->cycles)*100;
             if (n == settings->cycles - 1)
             {
                 progress = 100;

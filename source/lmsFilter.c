@@ -52,14 +52,14 @@ static int lmsFilter_countNumberOfSamplesInFile(const char* fileName)
  * @param error         Mean square error
  * @return LMS_OK when processed succesfully. Otherwise, return LMS_ERROR
  */
-static int lmsFilter_Lms(LmsFilter_t* filter, const double* input, const double* desired,
-                         double* output, double* error)
+static int lmsFilter_Lms(LmsFilter_t* filter, const float* input, const float* desired,
+                         float* output, float* error)
 {
     (void)desired;
 
     int retval = LMS_OK;
-    double y = 0.0;                         /* fitler output */
-    double x[MAX_FILTER_LENGTH] = { 0 };    /* fitler input */
+    float y = 0.0;                         /* fitler output */
+    float x[MAX_FILTER_LENGTH] = { 0 };    /* fitler input */
     int k;
 
     for (k = 0; k < filter->length; k++)
@@ -80,7 +80,7 @@ static int lmsFilter_Lms(LmsFilter_t* filter, const double* input, const double*
         *output = y;
     }
 
-    if (isfinite(*output) || isfinite(*error))
+    if (isfinite(*output) == 0)
     {
         printf("WARNING: Algorithm goes unstable! stopped\n");
         retval = LMS_ERROR;
@@ -88,7 +88,7 @@ static int lmsFilter_Lms(LmsFilter_t* filter, const double* input, const double*
     return retval;
 }
 
-int lmsFilter_Init(LmsFilter_t* filter, double step, int length)
+int lmsFilter_Init(LmsFilter_t* filter, float step, int length)
 {
     int retval = LMS_ERROR;
 
@@ -140,11 +140,11 @@ unsigned int lmsFilter_processArgumentFilterLength(const char* filterLength)
     return retval;
 }
 
-double lmsFilter_processArgumentStepSize(const char* stepSize)
+float lmsFilter_processArgumentStepSize(const char* stepSize)
 {
-    double retval = 0;
+    float retval = 0;
     char character;
-    double argNumber;
+    float argNumber;
     static unsigned int dotCounter = 0;
 
     for (int i = 0; (stepSize[i] != '\0'); i++)
@@ -217,11 +217,11 @@ int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFi
     }
 
     rewind(fSamples);  /* Reset file position indicator to beginning of the file */
-    double window[filter->length];
+    float window[filter->length];
     int index = 0;
     int zerosToAdd = filter->length - 1;
-    double output = 0;
-    double errror = 0;
+    float output = 0;
+    float errror = 0;
     int progress = 0;
 
     /* Slide window through input file and print each subsequence */
@@ -232,7 +232,7 @@ int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFi
             /* Fill the first window with initial values */
             for (int i = 0; i < filter->length; i++)
             {
-                if (fscanf(fSamples, "%lf;", &window[i]) != 1)
+                if (fscanf(fSamples, "%f;", &window[i]) != 1)
                 {
                     printf("Error reading file %s\n", inputFileName);
                     fclose(fSamples);
@@ -248,7 +248,7 @@ int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFi
             }
 
             /* Fill last element of window with next value from file or zero if end of file is reached */
-            if (fscanf(fSamples, "%lf;", &window[filter->length-1]) != 1)
+            if (fscanf(fSamples, "%f;", &window[filter->length-1]) != 1)
             {
                 window[filter->length-1] = 0;
                 if (--zerosToAdd < 0)
@@ -263,12 +263,12 @@ int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFi
         {
             break;
         }
-        fprintf(fFiltered, "%.6lf;%.6lf;%.6lf;\n", window[0], output, errror);
+        fprintf(fFiltered, "%d;%.6lf;%.6lf;%.6lf;\n",index, window[0], output, errror);
         index++;
 
         if (((index % 10) == 0) || (index == numOfSamples))
         {
-            progress = ((double)index/numOfSamples)*100;
+            progress = ((float)index/numOfSamples)*100;
             if (index == numOfSamples - 1)
             {
                 progress = 100;
