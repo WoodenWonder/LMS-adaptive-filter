@@ -21,7 +21,7 @@ typedef struct
 /**
  * @brief Initialize the filter structure with step size and filter length
  * @param filter    Structure holding LMS filter
- * @param ftep      Step size
+ * @param step      Step size
  * @param length    Filter length
  * @return LMS_OK when filter initialised succesfully. Otherwise, return LMS_ERROR
  */
@@ -45,12 +45,8 @@ float lmsFilter_processArgumentStepSize(const char* stepSize);
  * @brief Filtering function.
  * Applying the filter to the input signal and desired signal.
  * Saving processed samples to the file.
- * This implementation is a type of acoustic silencer. The input and desired signals are equal
  * @param filter            Pointer to LMS filter structure
- * @param desiredSignal     Array of additional input signal
- * @param outputSignal      Array of output signal
- * @param numSamples        Filter length/length
- * @param fileName          Name of the file with input samples
+ * @param fileName          Name of the file containing input samples
  * @return LMS_OK when processed succesfully. Otherwise, return LMS_ERROR
  */
 int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* fileName);

@@ -45,6 +45,7 @@ static int lmsFilter_countNumberOfSamplesInFile(const char* fileName)
 
 /**
  * @brief LMS filtering function. Applying the filter to the input signal and desired signal
+ * This implementation is a type of acoustic silencer. The input and desired signals are equal
  * @param filter        Pointer to LMS filter structure
  * @param input         Array of input samples, e.g. noise corrupted signal
  * @param desired       Array of additional input

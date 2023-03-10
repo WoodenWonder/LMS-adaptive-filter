@@ -14,8 +14,8 @@
 
 /**
  * @brief Generate sine wave based on given parameters
+ * @param settings          Parameters of signal
  * @param outputSamples     Buffer with generated samples
- * @param resolution        Resolution of generated sine wave
  * @return EXIT_SUCCESS when sine waveform generated and saved to the file
  */
 static int signalGenerator_generateSine(const SignalGenerator_t *settings, const char* outputFileName)

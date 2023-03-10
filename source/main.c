@@ -29,7 +29,7 @@ typedef enum
 } ArgFilter_t;
 
 /**
- * @brief Set of usage information
+ * @brief Usage information
  */
 static const char *const usage[] =
 {
@@ -83,7 +83,7 @@ static void printMissingParameterError(const char* target)
 }
 
 /**
- * @brief Process argument <file> in --generate mode
+ * @brief Process argument <file> in generator mode
  * @param filename  Argument with the name of the file to save the samples
  * @return EXIT_SUCCESS when filename is allowed
  */
@@ -111,7 +111,7 @@ static int processGenerateArgumentFile(const char* filename)
 }
 
 /**
- * @brief Process argument <file> in --filter mode
+ * @brief Process argument <file> in filtering mode
  * @param filename  Argument with the name of the file to read the samples
  * @return EXIT_SUCCESS when filename does not exist or is empty
  */
