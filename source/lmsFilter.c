@@ -51,14 +51,14 @@ static int lmsFilter_countNumberOfSamplesInFile(const char* fileName)
  * @param desired       Array of additional input
  * @param output        Array of output
  * @param error         Mean square error
- * @return LMS_OK when processed succesfully. Otherwise, return LMS_ERROR
+ * @return EXIT_SUCCESS when processed succesfully. Otherwise, return EXIT_FAILURE
  */
 static int lmsFilter_Lms(LmsFilter_t* filter, const float* input, const float* desired,
                          float* output, float* error)
 {
     (void)desired;
 
-    int retval = LMS_OK;
+    int retval = EXIT_SUCCESS;
     float y = 0.0;                         /* fitler output */
     float x[MAX_FILTER_LENGTH] = { 0 };    /* fitler input */
     int k;
@@ -84,14 +84,14 @@ static int lmsFilter_Lms(LmsFilter_t* filter, const float* input, const float* d
     if (isfinite(*output) == 0)
     {
         printf("WARNING: Algorithm goes unstable! stopped\n");
-        retval = LMS_ERROR;
+        retval = EXIT_FAILURE;
     }
     return retval;
 }
 
 int lmsFilter_Init(LmsFilter_t* filter, float step, int length)
 {
-    int retval = LMS_ERROR;
+    int retval = EXIT_FAILURE;
 
     if (filter != NULL)
     {
@@ -104,7 +104,7 @@ int lmsFilter_Init(LmsFilter_t* filter, float step, int length)
             {
                 filter->coefficients[i] = 0.0;
             }
-            retval = LMS_OK;
+            retval = EXIT_SUCCESS;
         }
         else
         {
@@ -187,13 +187,13 @@ float lmsFilter_processArgumentStepSize(const char* stepSize)
 
 int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFileName)
 {
-    int retval = LMS_OK;
+    int retval = EXIT_SUCCESS;
 
     FILE* fSamples = fopen(inputFileName, "r");
     if (fSamples == NULL)
     {
         perror(inputFileName);
-        return LMS_ERROR;
+        return EXIT_FAILURE;
     }
 
     int numOfSamples = lmsFilter_countNumberOfSamplesInFile(inputFileName);
@@ -201,7 +201,7 @@ int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFi
     {
         printf("Error: Filter length cannot be greater than number of samples in file\n");
         fclose(fSamples);
-        return LMS_ERROR;
+        return EXIT_FAILURE;
     }
 
     char* filteredFileName = NULL;
@@ -214,7 +214,7 @@ int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFi
     if (!fFiltered)
     {
         perror(filteredFileName);
-        return LMS_ERROR;
+        return EXIT_FAILURE;
     }
 
     rewind(fSamples);  /* Reset file position indicator to beginning of the file */
@@ -237,7 +237,7 @@ int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFi
                 {
                     printf("Error reading file %s\n", inputFileName);
                     fclose(fSamples);
-                    return LMS_ERROR;
+                    return EXIT_FAILURE;
                 }
             }
         }
@@ -260,7 +260,7 @@ int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFi
         }
 
         retval = lmsFilter_Lms(filter, window, NULL, &output, &errror);
-        if (retval != LMS_OK)
+        if (retval != EXIT_SUCCESS)
         {
             break;
         }
@@ -286,12 +286,12 @@ int lmsFilter_FilterSignalAndSaveToFile(LmsFilter_t* filter, const char* inputFi
     if (fclose(fSamples))
     {
         perror(inputFileName);
-        return LMS_ERROR;
+        return EXIT_FAILURE;
     }
     if (fclose(fFiltered))
     {
         perror(filteredFileName);
-        return LMS_ERROR;
+        return EXIT_FAILURE;
     }
 
     free(filteredFileName);

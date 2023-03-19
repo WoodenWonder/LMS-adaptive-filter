@@ -30,6 +30,6 @@ trace1 = go.Scatter(x=x, y=y1, mode='lines', name='y1')
 trace2 = go.Scatter(x=x, y=y2, mode='lines', name='y2')
 trace3 = go.Scatter(x=x, y=y3, mode='lines', name='y3')
 data = [trace1, trace2, trace3]
-layout = go.Layout(title='My Plot', xaxis=dict(title='X'), yaxis=dict(title='Y'))
+layout = go.Layout(title='Waveform', xaxis=dict(title='X'), yaxis=dict(title='Y'))
 fig = go.Figure(data=data, layout=layout)
 fig.show()

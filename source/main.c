@@ -13,6 +13,8 @@
 #define ARGC_NUMBER_FOR_GENERATE_MODE   6
 #define ARGC_NUMBER_FOR_FILTER_MODE     5
 
+static const char pythonPlotScript[20] = "../scripts/plot.py";
+
 typedef enum
 {
     GENERATE_ARG_TYPE = 2,
@@ -293,6 +295,21 @@ int main(int argc, char **argv)
                     }
                 }
                 retval = lmsFilter_FilterSignalAndSaveToFile(&filter, argv[FILTER_ARG_FILE]);
+                if (retval == EXIT_SUCCESS)
+                {
+                    int status = 0;
+                    const char* filteredFileSuffix = "filtered";
+                    char *command = NULL;
+                    command = (char*)malloc(strlen("python") + 2 + strlen(argv[FILTER_ARG_FILE]) + strlen(filteredFileSuffix) + 1);
+                    sprintf(command, "python %s %s%s", pythonPlotScript, argv[FILTER_ARG_FILE], filteredFileSuffix);
+                    status = system(command);
+                    if (status == -1)
+                    {
+                        printf("Error executing script\n");
+                        return EXIT_FAILURE;
+                    }
+                    free(command);
+                }
             }
             else
             {
