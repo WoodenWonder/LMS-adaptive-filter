@@ -12,6 +12,7 @@
 #define MAX_ARGC_NUMBER                 6
 #define ARGC_NUMBER_FOR_GENERATE_MODE   6
 #define ARGC_NUMBER_FOR_FILTER_MODE     5
+#define ARGC_NUMBER_FOR_PLOT_MODE       3
 
 static const char pythonPlotScript[20] = "../scripts/plot.py";
 
@@ -40,6 +41,7 @@ static const char *const usage[] =
     "  --version                                            Display version information.\n",
     "  --generate <type> <resolution> <cycles> <file>       Generate samples for the selected waveform and number of cycles and save them to a file\n",
     "  --filter <length> <stepsize> <file>                  Filter the signal in the form of samples read from the file. The parameters of the LMS filter are filter length(order) and step size\n",
+    "  --plot <file>                                        Plot filtered waveform from file",
     NULL
 };
 
@@ -300,7 +302,10 @@ int main(int argc, char **argv)
                     int status = 0;
                     const char* filteredFileSuffix = "filtered";
                     char *command = NULL;
-                    command = (char*)malloc(strlen("python") + 2 + strlen(argv[FILTER_ARG_FILE]) + strlen(filteredFileSuffix) + 1);
+                    command = (char*)malloc(strlen("python") + 1
+                                            + strlen(pythonPlotScript) + 1
+                                            + strlen(argv[FILTER_ARG_FILE])
+                                            + strlen(filteredFileSuffix) + 1);
                     sprintf(command, "python %s %s%s", pythonPlotScript, argv[FILTER_ARG_FILE], filteredFileSuffix);
                     status = system(command);
                     if (status == -1)
@@ -310,6 +315,30 @@ int main(int argc, char **argv)
                     }
                     free(command);
                 }
+            }
+            else
+            {
+                printMissingParameterError(argv[0]);
+                return EXIT_FAILURE;
+            }
+        }
+        else if (strncmp(argv[1], "--plot", (sizeof("--plot")-1)) == 0)
+        {
+            if (argc == ARGC_NUMBER_FOR_PLOT_MODE)
+            {
+                int status = 0;
+                char *command = NULL;
+                command = (char*)malloc(strlen("python") + 1
+                                        + strlen(pythonPlotScript) + 1
+                                        + strlen(argv[ARGC_NUMBER_FOR_PLOT_MODE-1]) + 1);
+                sprintf(command, "python %s %s", pythonPlotScript, argv[ARGC_NUMBER_FOR_PLOT_MODE-1]);
+                status = system(command);
+                if (status == -1)
+                {
+                    printf("Error executing script\n");
+                    return EXIT_FAILURE;
+                }
+                free(command);
             }
             else
             {
