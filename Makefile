@@ -1,37 +1,41 @@
-TARGET ?= lms
+PROJECT = lms
+
+SRCDIR = source
+INCDIR = include
+BUILDDIR = build
 
 MAJOR_VERSION ?= 1
 MINOR_VERSION ?= 0
 PATCH_VERSION ?= 0
 
-SOURCE_DIR ?= source
-INCLUDE_DIR ?= include
-BUILD_DIR ?= build
+TARGET = $(BUILDDIR)/$(PROJECT)
 
-SOURCES := $(shell find $(SOURCE_DIR) -name "*.c" -or -name "*.s")
-OBJECTS := $(SOURCES:%=$(BUILD_DIR)/%.o)
-DEPENDENCIES := $(OBJECTS:.o=.d)
-
-INCLUDE_DIR := $(shell find $(INCLUDE_DIR) -type d)
-INCLUDE_FLAGS := $(addprefix -I,$(INCLUDE_DIR))
-
-CC ?= gcc
-CFLAGS ?= $(INCLUDE_FLAGS) -O0 -MMD -MP -W -Wall -Wextra
+CC = gcc
+CFLAGS = -Wall -Wextra -g -O0 -MMD -MP -W
 CFLAGS += -DMAJOR_VERSION=$(MAJOR_VERSION)
 CFLAGS += -DMINOR_VERSION=$(MINOR_VERSION)
 CFLAGS += -DPATCH_VERSION=$(PATCH_VERSION)
+LDFLAGS = -lm
 
-$(BUILD_DIR)/$(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) -o $@ $(LDFLAGS) -lm
+SOURCES := $(wildcard $(SRCDIR)/*.c)
+OBJECTS := $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/%.o,$(SOURCES))
+ASSEMBLY := $(patsubst $(SRCDIR)/%.c,$(BUILDDIR)/%.s,$(SOURCES))
 
-$(BUILD_DIR)/%.c.o: %.c
-	$(MKDIR_P) $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+.PHONY: all clean
 
-.PHONY: clean
+all: $(TARGET) $(ASSEMBLY)
+
+$(TARGET): $(OBJECTS)
+	@mkdir -p $(BUILDDIR)
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
+$(BUILDDIR)/%.o: $(SRCDIR)/%.c
+	@mkdir -p $(BUILDDIR)
+	$(CC) $(CFLAGS) -I$(INCDIR) -c $< -o $@
+
+$(BUILDDIR)/%.s: $(SRCDIR)/%.c
+	@mkdir -p $(BUILDDIR)
+	$(CC) $(CFLAGS) -I$(INCDIR) -S -masm=intel $< -o $@
+
 clean:
-	$(RM) -r $(BUILD_DIR)
-
--include $(DEPENDENCIES)
-
-MKDIR_P ?= mkdir -p
+	rm -rf $(BUILDDIR)
