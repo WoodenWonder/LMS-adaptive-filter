@@ -1,7 +1,9 @@
 /**
- *  @brief Signal generator header
- *  @author shed258
-
+ * @file signalGenerator.h
+ * @author shed258
+ * @brief Signal generator header
+ * @version 1.0.0
+ *
  */
 
 #ifndef SIGNAL_GENERATOR_H
@@ -24,7 +26,7 @@ typedef struct
 
 /**
  * @brief Process argument <type>
- * @param type  string with argument to process
+ * @param[in] type  string with argument to process
  * @return enumerated type of signal
  */
 TypeOfGenSignal_t signalGenerator_processArgumentType(const char* type);

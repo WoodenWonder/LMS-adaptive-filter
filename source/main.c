@@ -1,6 +1,9 @@
 /**
- *  @brief Main source file
- *  @author shed258
+ * @file main.c
+ * @author shed258
+ * @brief Main source file
+ * @version 1.0.0
+ *
  */
 
 #include <stdlib.h>

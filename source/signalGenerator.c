@@ -1,6 +1,9 @@
 /**
- *  @brief Signal generator source file
- *  @author shed258
+ * @file signalGenerator.c
+ * @author shed258
+ * @brief Signal generator source file
+ * @version 1.0.0
+ *
  */
 
 #include <stdlib.h>

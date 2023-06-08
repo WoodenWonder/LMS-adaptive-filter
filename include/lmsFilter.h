@@ -1,6 +1,9 @@
 /**
- *  @brief Lms filter header
- *  @author shed258
+ * @file lmsFilter.h
+ * @author shed258
+ * @brief Lms filter header
+ * @version 1.0.0
+ *
  */
 
 #ifndef LMS_FILTER_H

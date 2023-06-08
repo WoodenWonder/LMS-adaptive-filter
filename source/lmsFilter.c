@@ -1,6 +1,9 @@
 /**
- *  @brief Lms filter source file
- *  @author shed258
+ * @file lmsFilter.c
+ * @author shed258
+ * @brief Lms filter source file
+ * @version 1.0.0
+ *
  */
 
 #include <stdlib.h>
